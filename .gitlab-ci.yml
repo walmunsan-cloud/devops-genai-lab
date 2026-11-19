@@ -1,0 +1,21 @@
+stages: [test, analysis]
+unit_test:
+  stage: test
+  image: python:3.12-slim
+  script:
+    - pip install -r requirements.txt
+    - python -m pytest -v > test.log 2>&1 || { cat test.log; exit 1; }
+  artifacts:
+    when: always
+    paths: [test.log]
+ai_debugger:
+  stage: analysis
+  image: python:3.12-slim
+  when: on_failure
+  allow_failure: true
+  script:
+    - pip install -r requirements.txt
+    - python genai_analyst.py
+  artifacts:
+    when: always
+    paths: [relatorio_ia.md]
